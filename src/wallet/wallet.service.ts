@@ -1,11 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { WalletRepository } from "./repositories/wallet.repository";
+import { TransactionsService } from "src/transactions/transaction.service";
+import { TransactionType } from "src/transactions/interface";
 
 
 @Injectable()
 export class WalletService{
     constructor(
-        private readonly walletRepository:WalletRepository
+        private readonly walletRepository:WalletRepository,
+        private readonly transactionService: TransactionsService
     ){}
 
 
@@ -31,7 +34,10 @@ export class WalletService{
             
             const newBalance = wallet.balance + amount
 
-            return await this.walletRepository.save({...wallet, balance:newBalance})
+            const transaction = await this.walletRepository.save({...wallet, balance:newBalance})
+            await this.transactionService.createTransaction(userId, amount, TransactionType.DEPOSIT)
+
+            return transaction
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }
@@ -59,7 +65,11 @@ export class WalletService{
             
             const newBalance = wallet.balance - amount
 
-            return await this.walletRepository.save({...wallet, balance:newBalance})
+            const newWalletRecord = await this.walletRepository.save({...wallet, balance:newBalance})
+
+            await this.transactionService.createTransaction(userId, amount, TransactionType.DEBIT)
+
+            return newWalletRecord
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }

@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
 import { WalletModule } from './wallet/wallet.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { TransactionsModule } from './transactions/transactions.module';
     ProductModule,
     AuthModule,
     WalletModule,
-    TransactionsModule
+    TransactionsModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [AppService],

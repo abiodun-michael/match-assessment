@@ -6,6 +6,7 @@ import { IPaginationOptions, Pagination, paginate } from "nestjs-typeorm-paginat
 import { WalletService } from "src/wallet/wallet.service";
 import { Product } from "./entities/product.entity";
 import { UpdateProductDto } from "./dto/update-product.dto";
+import { OrderService } from "src/order/order.service";
 
 
 @Injectable()
@@ -13,7 +14,8 @@ export class ProductService{
 
     constructor(
         private readonly productRepository:ProductRepository,
-        private readonly walletService:WalletService
+        private readonly walletService:WalletService,
+        private readonly orderService:OrderService
     ){}
 
     async checkProductByName(productName:string):Promise<Product>{
@@ -136,4 +138,8 @@ export class ProductService{
         }
     }
     
+
+    async getOrders(page:number, limit:number, id:string){
+        return await this.orderService.getAllOrderByProductId({page,limit},id)
+    }
 }

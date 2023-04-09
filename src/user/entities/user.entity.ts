@@ -1,6 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { UserRole } from "../interfaces"
 import { Product } from "src/product/entities/product.entity"
+import { Order } from "src/order/entities/order.entity"
 
 @Entity("users")
 export class User extends BaseEntity{
@@ -23,8 +24,13 @@ export class User extends BaseEntity{
     })
     password:string
 
+
     @OneToMany(()=>Product,(product)=>product.user)
     products:Product[]
+
+
+    @OneToMany(()=>Order,(order)=>order.user)
+    order:Order[]
 
     @Index()
      @Column({

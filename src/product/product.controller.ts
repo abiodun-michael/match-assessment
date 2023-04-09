@@ -27,6 +27,15 @@ export class ProductController{
         return this.productService.getProductById(id)
     }
 
+    @Get(":id/orders")
+    getProductOrders(
+        @Param("id") id:string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+        ){
+        return this.productService.getOrders(page, limit, id)
+    }
+
     @Post()
     @UseGuards(SellerGuard)
     createProduct(@Body() dto:CreateProductDto, @Session() {user}:any){

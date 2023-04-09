@@ -1,5 +1,6 @@
+import { Order } from "src/order/entities/order.entity"
 import { User } from "src/user/entities/user.entity"
-import { BaseEntity, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { BaseEntity, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 
 @Entity("products")
 export class Product extends BaseEntity{
@@ -21,12 +22,15 @@ export class Product extends BaseEntity{
     @Column({
         type:'varchar',
         nullable:false
-     })
-     productName:string
+    })
+    productName:string
 
-     @Index()
-     @ManyToOne(() => User, (user)=>user.products)
-     user: User
+    @Index()
+    @ManyToOne(() => User, (user)=>user.products)
+    user: User
+
+    @OneToMany(()=>Order, (order)=>order.product)
+    order:Order[]
 
     @CreateDateColumn()
     createdAt: Date;
