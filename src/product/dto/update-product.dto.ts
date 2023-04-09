@@ -7,15 +7,15 @@ export class UpdateProductDto{
     @ApiProperty()
     @IsString()
     @IsOptional()
-    productName: string
+    productName?: string
 
     @ApiProperty()
     @IsNumber()
     @IsOptional()
-    amountAvailable: number
+    amountAvailable?: number
 
     @ApiProperty()
     @IsNumber()
     @IsOptional()
-    cost: number
+    cost?: number
 }

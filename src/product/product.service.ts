@@ -5,6 +5,7 @@ import { CreateProductDto } from "./dto/create-product.dto";
 import { IPaginationOptions, Pagination, paginate } from "nestjs-typeorm-paginate";
 import { WalletService } from "src/wallet/wallet.service";
 import { Product } from "./entities/product.entity";
+import { UpdateProductDto } from "./dto/update-product.dto";
 
 
 @Injectable()
@@ -55,7 +56,7 @@ export class ProductService{
         }
     }
 
-    async updateProduct(id:string, dto:CreateProductDto, sellerId:string):Promise<Product>{
+    async updateProduct(id:string, dto:UpdateProductDto, sellerId:string):Promise<Product>{
         try{
            const product = await this.getProductOptions({id, user:{id:sellerId}})
            if(!product){
@@ -113,13 +114,23 @@ export class ProductService{
             if(product.amountAvailable < 1){
                 throw new HttpException("Product is out of stock", HttpStatus.BAD_REQUEST)
             }
+            if(product.amountAvailable > amount){
+                throw new HttpException("Product in stock less than amount requested", HttpStatus.BAD_REQUEST)
+            }
+
             const productTotalCost = product.cost * amount
+            const remaining = product.amountAvailable - amount
 
             await this.walletService.debit(productTotalCost, userId)
             await this.walletService.deposit(productTotalCost,product.user.id)
 
+            const updated = await this.updateProduct(product.id, {amountAvailable: remaining},product.user.id)
 
-            return product
+            return{
+                totalProductBought: amount,
+                amountSpent:productTotalCost,
+                ...updated
+            }
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }
