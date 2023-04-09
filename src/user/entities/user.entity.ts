@@ -1,12 +1,14 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { UserRole } from "../interfaces"
+import { Product } from "src/product/entities/product.entity"
 
-@Entity()
+@Entity("users")
 export class User extends BaseEntity{
 
     @PrimaryGeneratedColumn('uuid')
     id:string
 
+    @Index()
     @Column({
         type:'varchar',
         length:20,
@@ -21,6 +23,10 @@ export class User extends BaseEntity{
     })
     password:string
 
+    @OneToMany(()=>Product,(product)=>product.user)
+    products:Product[]
+
+    @Index()
      @Column({
         type:'enum',
         nullable:false,

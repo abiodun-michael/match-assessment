@@ -1,15 +1,16 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { BaseEntity, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { User } from "src/user/entities/user.entity"
 import { TransactionType } from "../interface"
 
 
 
-@Entity()
+@Entity("transactions")
 export class Transaction extends BaseEntity{
 
     @PrimaryGeneratedColumn('uuid')
     id:string
 
+    @Index()
     @OneToOne(() => User)
     @JoinColumn()
     user: User

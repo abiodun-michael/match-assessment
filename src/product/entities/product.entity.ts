@@ -1,8 +1,9 @@
 import { User } from "src/user/entities/user.entity"
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { BaseEntity, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 
-@Entity()
+@Entity("products")
 export class Product extends BaseEntity{
+
 
     @PrimaryGeneratedColumn('uuid')
     id:string
@@ -23,8 +24,8 @@ export class Product extends BaseEntity{
      })
      productName:string
 
-     @OneToOne(() => User)
-     @JoinColumn()
+     @Index()
+     @ManyToOne(() => User, (user)=>user.products)
      user: User
 
     @CreateDateColumn()

@@ -8,11 +8,11 @@ export enum UserRole{
 export interface IUser{
     id:string
     username:string
-    deposit:number
     role:string
     createdAt:Date
     updatedAt:Date
 }
+
 
 export interface UserInputData{
     username:string

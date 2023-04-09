@@ -4,6 +4,8 @@ import { CreateProductDto } from "./dto/create-product.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { SellerGuard } from "src/common/guards/seller.guard";
 import { BuyerGuard } from "src/common/guards/buyer.guard";
+import { BuyProductDto } from "./dto/buy-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
 
 @ApiTags("Products")
 @Controller("product")
@@ -33,7 +35,7 @@ export class ProductController{
 
     @Put(":id")
     @UseGuards(SellerGuard)
-    updateProduct(@Param("id") id:string, @Body() dto:CreateProductDto, @Session() {user}:any){
+    updateProduct(@Param("id") id:string, @Body() dto:UpdateProductDto, @Session() {user}:any){
         return this.productService.updateProduct(id, dto, user.id)
     }
 
@@ -45,7 +47,7 @@ export class ProductController{
 
     @Put(":id/buy")
     @UseGuards(BuyerGuard)
-    buyProduct(@Param("id") id:string, @Session() {user}:any){
-        return null
+    buyProduct(@Param("id") id:string, @Body() dto:BuyProductDto, @Session() {user}:any){
+        return this.productService.buyProduct(dto.amountAvailable, id, user.id)
     }
 }

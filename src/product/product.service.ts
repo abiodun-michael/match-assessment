@@ -1,15 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProductRepository } from "./repositories/product.repository";
-import { Product } from "./interfaces";
+import { IProduct } from "./interfaces";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { IPaginationOptions, Pagination, paginate } from "nestjs-typeorm-paginate";
+import { WalletService } from "src/wallet/wallet.service";
+import { Product } from "./entities/product.entity";
 
 
 @Injectable()
 export class ProductService{
 
     constructor(
-        private readonly productRepository:ProductRepository
+        private readonly productRepository:ProductRepository,
+        private readonly walletService:WalletService
     ){}
 
     async checkProductByName(productName:string):Promise<Product>{
@@ -68,7 +71,12 @@ export class ProductService{
 
     async getProductById(id:string):Promise<Product>{
         try{
-           return await this.productRepository.findOneBy({id})
+           const product = await this.productRepository.findOne({where:{id}, relations:["user"]})
+
+           delete product.user.password
+           delete product.user.role
+
+           return product
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }
@@ -84,8 +92,34 @@ export class ProductService{
 
     async getAllProduct(options:IPaginationOptions):Promise<Pagination<Product>>{
         try{
-           const productBuilder = this.productRepository.createQueryBuilder("product")
+           const productBuilder = this.productRepository.createQueryBuilder("products")
            return paginate<Product>(productBuilder, options)
+        }catch(error:any){
+            throw new HttpException(error.message, error.statusCode)
+        }
+    }
+
+    async buyProduct(amount:number, productId:string, userId:string){
+        try{
+            const product = await this.getProductById(productId)
+            
+            if(amount < 1){
+                throw new HttpException("Product amount must be above 0", HttpStatus.BAD_REQUEST)
+            }
+
+            if(!product){
+                throw new HttpException("Product is not found", HttpStatus.NOT_FOUND)
+            }
+            if(product.amountAvailable < 1){
+                throw new HttpException("Product is out of stock", HttpStatus.BAD_REQUEST)
+            }
+            const productTotalCost = product.cost * amount
+
+            await this.walletService.debit(productTotalCost, userId)
+            await this.walletService.deposit(productTotalCost,product.user.id)
+
+
+            return product
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }

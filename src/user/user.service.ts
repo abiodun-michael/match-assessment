@@ -15,7 +15,10 @@ export class UserService{
 
     async createUser(dto:UserInputData):Promise<User>{
         try{
-            return await this.userRepository.save(dto)
+            const user = await this.userRepository.save(dto)
+            await this.walletService.createWallet(user.id)
+
+            return user
         }catch(error:any){
             throw new HttpException(error.message, error.statusCode)
         }
